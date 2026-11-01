@@ -112,3 +112,12 @@ class Mensagem(Base):
     texto: Mapped[str] = mapped_column(Text)
     wa_id: Mapped[str | None] = mapped_column(String(80), index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=agora)
+
+
+class Usuario(Base):
+    """Login do painel. Cada usuário pertence a uma empresa."""
+    __tablename__ = "usuarios"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    tenant_id: Mapped[int] = mapped_column(ForeignKey("tenants.id"), index=True)
+    email: Mapped[str] = mapped_column(String(160), unique=True)
+    senha_hash: Mapped[str] = mapped_column(String(200))

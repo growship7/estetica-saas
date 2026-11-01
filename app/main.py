@@ -2,10 +2,13 @@ import logging
 import secrets
 from contextlib import asynccontextmanager
 
+from pathlib import Path
+
 from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
+from fastapi.responses import FileResponse, RedirectResponse
 from sqlalchemy import select
 
-from . import config, whatsapp
+from . import config, painel, whatsapp
 from .agent import responder
 from .db import Base, SessionLocal, engine
 from .models import Cliente, Conversa, Mensagem, Tenant
@@ -20,6 +23,17 @@ async def lifespan(app):
 
 
 app = FastAPI(title="Estética SaaS", lifespan=lifespan)
+app.include_router(painel.router)
+
+
+@app.get("/", include_in_schema=False)
+def raiz():
+    return RedirectResponse("/painel")
+
+
+@app.get("/painel", include_in_schema=False)
+def pagina_painel():
+    return FileResponse(Path(__file__).parent / "static" / "painel.html")
 
 
 @app.get("/health")
